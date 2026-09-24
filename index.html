@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Desk Pods · Spotify</title>
+<style>body{margin:0;background:#050607;color:#EDF1F5;font:15px/1.5 Inter,-apple-system,system-ui,sans-serif;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px;box-sizing:border-box}
+.box{max-width:520px;background:#0E1114;border:1px solid #1F262C;border-radius:22px;padding:26px 30px}h1{font-size:18px;margin:0 0 10px}h1 span{color:#00D96A}p{color:#98A2AD;margin:8px 0}
+code{display:block;background:#000;border:1px solid #1F262C;border-radius:10px;padding:10px 12px;word-break:break-all;color:#EDF1F5;user-select:all;margin:10px 0}
+a{color:#00D96A}</style></head>
+<body><div class="box"><h1>Desk <span>Pods</span></h1><div id="m"><p>Finishing your Spotify sign-in…</p></div></div>
+<script>
+// Spotify only redirects to HTTPS pages, so it lands here; this page just hands the code to your hub
+// on your own network. It keeps nothing and talks to nobody else.
+(function(){
+  const q=new URLSearchParams(location.search), m=document.getElementById('m');
+  const code=q.get('code'), err=q.get('error'); let st={};
+  try{ st=JSON.parse(atob((q.get('state')||'').replace(/-/g,'+').replace(/_/g,'/'))); }catch(e){}
+  if(err){ m.innerHTML='<p>Spotify said: <b>'+err.replace(/[<>&]/g,'')+'</b>.</p><p>Go back to your hub page and try again.</p>'; return; }
+  if(!code){ m.innerHTML='<p>Nothing to do here. Start the sign-in from your hub page.</p>'; return; }
+  const hub=(st.hub||'').replace(/\/+$/,'');
+  if(/^https?:\/\//.test(hub)){
+    const to=hub+'/api/spotify/callback?code='+encodeURIComponent(code)+'&state='+encodeURIComponent(q.get('state')||'');
+    m.innerHTML='<p>Sending you back to your hub…</p><p>If nothing happens, <a href="'+to+'">tap here</a>, or paste this into the hub page:</p><code>'+location.href.replace(/[<>&]/g,'')+'</code>';
+    setTimeout(()=>location.replace(to),400);
+  } else {
+    m.innerHTML='<p>Signed in. Copy this address and paste it into the hub page under <b>Paste the address instead</b>:</p><code>'+location.href.replace(/[<>&]/g,'')+'</code>';
+  }
+})();
+</script></body></html>
